@@ -174,28 +174,6 @@ var decoded = decodeURI(enc);</code></pre>
         </section>
 
         <section>
-          <h2>V8 Interpreter</h2>
-          <h3 style="color:red"><code>src/node.cc</code></h3>
-          <pre><code class="cpp">
-int Start(int argc, char** argv) {
-
-  assert(argc &gt; 0);
-
-  int exec_argc;
-  const char** exec_argv;
-  Init(&amp;argc, const_cast&lt;const char**&gt;(argv), &amp;exec_argc, &amp;exec_argv);
-
-#if HAVE_OPENSSL
-  V8::SetEntropySource(crypto::EntropySource);
-#endif
-
-  V8::Initialize();
-  // etc.
-}
-          </code></pre>
-        </section>
-
-        <section>
           <h2>libuv</h2>
           <p>Asynchronous I/O &amp; Event Loop</p>
           <ul>
@@ -347,21 +325,6 @@ fs.exists = function(path, callback) {
         </section>
 
         <section>
-          <h2>Javascript API</h2>
-          <h3 style="color:red"><code>User Code - Unchanged</code></h3>
-          <pre><code class="javascript">
-    var http = require('http');
-
-    http.createServer(function (req, res) {
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('Hello World\n');
-    }).listen(1337, '127.0.0.1');
-
-    console.log('Server running at http://127.0.0.1:1337/');
-          </code></pre>
-        </section>
-
-        <section>
           <h2>JVM Javascript Runtime</h2>
           <p>DynJS</p>
           <p>Nashorn (future)</p>
@@ -378,6 +341,21 @@ fs.exists = function(path, callback) {
             <li>A timer has timed out</li>
             <li>A network server has bound to a port</li>
           </ul>
+        </section>
+
+        <section>
+          <h2>Javascript API</h2>
+          <h3 style="color:red"><code>User Code - Unchanged</code></h3>
+          <pre><code class="javascript">
+    var http = require('http');
+
+    http.createServer(function (req, res) {
+      res.writeHead(200, {'Content-Type': 'text/plain'});
+      res.end('Hello World\n');
+    }).listen(1337, '127.0.0.1');
+
+    console.log('Server running at http://127.0.0.1:1337/');
+          </code></pre>
         </section>
 
         <section>
