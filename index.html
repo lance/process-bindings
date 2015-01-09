@@ -47,15 +47,30 @@
           <h3>How to do Node.js on the JVM</h3>
           <p>&ofcir;</p>
           <p>
-            Asheville Coder's League
+            CodeMash 2015
           </p>
-					<p>
-						<small><a href="http://lanceball.com">Lance Ball</a> / <a href="http://twitter.com/lanceball">@lanceball</a>
-            &ofcir;
-            December 3, 2014
-          </small>
-					</p>
 				</section>
+
+        <section>
+          <img style="border:none" src="images/redhat-logo.jpg" alt="Red Hat logo"/>
+          <img style="border:none" src="images/jboss-logo.png" alt="JBoss logo"/>
+          <br/>
+          <img style="border:none" src="images/projectodd-logo.png" alt="project:odd logo"/>
+					<p>
+						<a href="http://lanceball.com">Lance Ball</a> / <a href="http://twitter.com/lanceball">@lanceball</a>
+					</p>
+        </section>
+
+        <section>
+          <h2>project:odd</h2>
+          <img style="border:none" src="images/nodyn.png" alt="Nodyn logo"/>
+          <br/>
+          <img style="border:none" src="images/jruby.png" alt="JRuby logo"/>
+          <img style="border:none" src="images/dynjs.png" alt="DynJS logo"/>
+          <br/>
+          <img style="border:none" src="images/immutant.png" alt="Immutant logo"/>
+          <img style="border:none" src="images/torquebox-logo.png" alt="TorqueBox logo"/>
+        </section>
 
 				<section>
           <h2>But Why?</h2>
@@ -69,7 +84,7 @@
           <small><a href="https://www.joyent.com/blog/node-js-advisory-board">Node.js Advisory Board - October 23, 2014</a></small>
 				</section>
 
-				<section>
+        <section>
           <h2>Language or Runtime?</h2>
           <ul>
             <li class="fragment">
@@ -116,7 +131,7 @@ var decoded = decodeURI(enc);</code></pre>
 }, 1,500,000);</code></pre>
             </li>
             <li style="background-color: #f00">
-              <pre style="padding:0 18px"><code data-trim>var enc = "foo.asp?name=st%C3%A5le&car=saab";
+              <pre style="padding:0 18px"><code data-trim>var enc = "foo.asp?name=st%C3%A5le&amp;car=saab";
 var decoded = decodeURI(enc);</code></pre>
             </li>
             <li>
@@ -144,7 +159,7 @@ var decoded = decodeURI(enc);</code></pre>
 }, 1,500,000);</code></pre>
             </li>
             <li>
-              <pre style="padding:0 18px"><code data-trim>var enc = "foo.asp?name=st%C3%A5le&car=saab";
+              <pre style="padding:0 18px"><code data-trim>var enc = "foo.asp?name=st%C3%A5le&amp;car=saab";
 var decoded = decodeURI(enc);</code></pre>
             </li>
             <li style="background-color:red">
@@ -156,6 +171,25 @@ var decoded = decodeURI(enc);</code></pre>
         <section>
           <h2>Node.js Architecture</h2>
 					<img src="process-bindings.png" alt="Node Architecture" />
+        </section>
+
+        <section>
+          <h2>V8 ECMAScript Engine</h2>
+          <ul>
+            <li>Developed by Google</li>
+            <li>Chrome and Node.js runtime</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>libuv</h2>
+          <p>Asynchronous I/O &amp; Event Loop</p>
+          <ul>
+            <li>File is ready for writing</li>
+            <li>Socket has data ready for reading</li>
+            <li>A timer has timed out</li>
+            <li>A network server has bound to a port</li>
+          </ul>
         </section>
 
         <section>
@@ -174,14 +208,7 @@ var decoded = decodeURI(enc);</code></pre>
         </section>
 
         <section>
-          <h2>libuv</h2>
-          <p>Asynchronous I/O &amp; Event Loop</p>
-          <ul>
-            <li>File is ready for writing</li>
-            <li>Socket has data ready for reading</li>
-            <li>A timer has timed out</li>
-            <li>A network server has bound to a port</li>
-          </ul>
+          <img src="images/doge.png" alt="such doge" style='border:none'/>
         </section>
 
         <section>
@@ -207,28 +234,6 @@ var decoded = decodeURI(enc);</code></pre>
 </code></pre>
           <p>Node.js main function takes a <code>process</code> object</p>
         </section>
-
-        <section>
-          <h2>Loading Node.js in V8</h2>
-          <h3 style="color:red"><code>src/node.cc</code></h3>
-          <pre><code class="cpp">void Load(Environment* env) {
-  // Compile, execute the src/node.js file. The node.js file returns a function 'f'
-
-  Local&lt;String&gt; script_name = FIXED_ONE_BYTE_STRING(env-&gt;isolate(), "node.js");
-  Local&lt;Value&gt; f_value = ExecuteString(env, MainSource(env), script_name);
-  Local&lt;Function&gt; f = Local&lt;Function&gt;::Cast(f_value);
-
-  // Now we call 'f' with the 'process' variable that we've built up with
-  // all our bindings. Inside node.js we'll take care of assigning things to
-  // their places.
-
-  Local&lt;Object&gt; global = env-&gt;context()-&gt;Global();
-  Local&lt;Value&gt; arg = env-&gt;process_object();
-  f-&gt;Call(global, 1, &arg);
-}</code></pre>
-          <p>Node.js V8 layer loads lib/node.js providing a process object</p>
-        </section>
-
 
         <section>
           <h2>Process Bindings</h2>
@@ -278,6 +283,28 @@ var decoded = decodeURI(enc);</code></pre>
         </section>
 
         <section>
+          <h2>Loading Node.js in V8</h2>
+          <h3 style="color:red"><code>src/node.cc</code></h3>
+          <pre><code class="cpp">void Load(Environment* env) {
+  // Compile, execute the src/node.js file. The node.js file returns a function 'f'
+
+  Local&lt;String&gt; script_name = FIXED_ONE_BYTE_STRING(env-&gt;isolate(), "node.js");
+  Local&lt;Value&gt; f_value = ExecuteString(env, MainSource(env), script_name);
+  Local&lt;Function&gt; f = Local&lt;Function&gt;::Cast(f_value);
+
+  // Now we call 'f' with the 'process' variable that we've built up with
+  // all our bindings. Inside node.js we'll take care of assigning things to
+  // their places.
+
+  Local&lt;Object&gt; global = env-&gt;context()-&gt;Global();
+  Local&lt;Value&gt; arg = env-&gt;process_object();
+  f-&gt;Call(global, 1, &arg);
+}</code></pre>
+          <p>Node.js V8 layer loads lib/node.js providing a process object</p>
+        </section>
+
+
+        <section>
           <h2><code>process.binding()</code></h2>
           <h3 style="color:red"><code>lib/fs.js</code></h3>
           <pre><code class="javascript">var binding = process.binding('fs');
@@ -325,22 +352,28 @@ fs.exists = function(path, callback) {
         </section>
 
         <section>
-          <h2>JVM Javascript Runtime</h2>
-          <p>DynJS</p>
-          <p>Nashorn (future)</p>
-          <p class="fragment">OWAIT</p>
-          <p class="fragment">This doesn't give us anything other than pure JS. What about <code>setTimeout</code> and all of the other crunchy Node.js goodness?</p>
+          <img style="border:none" src="images/dynjs.png" alt="DynJS logo"/>
+          <p>Developed by <code style="color:red">project odd</code> at Red Hat.</p>
+          <p>Apache 2.0 License</p>
+        </section>
+
+        <section>
+          <h2>Javascript / Java Interop</h2>
+          <h3 style="color:red"><code>nodyn/bindings/os.js</code></h3>
+          <pre><code>// Called by Node's os module.
+// Node has no idea and does not care that a Java method
+// is used to obtain and return the results.
+
+exports.getTotalMem = function() {
+  return java.lang.Runtime.getRuntime().totalMemory();
+}; </code></pre>
+          <p>Unlike V8, the JS runtimes on the JVM provide direct access to native objects</p>
         </section>
 
         <section>
           <h2>Netty</h2>
+          <a href="http://netty.io">http://netty.io</a>
           <p>Asynchronous I/O &amp; Event Loop</p>
-          <ul>
-            <li>File is ready for writing</li>
-            <li>Socket has data ready for reading</li>
-            <li>A timer has timed out</li>
-            <li>A network server has bound to a port</li>
-          </ul>
         </section>
 
         <section>
@@ -359,31 +392,8 @@ fs.exists = function(path, callback) {
         </section>
 
         <section>
-          <h2>Loading Node.js in DynJS</h2>
-          <h3 style="color:red"><code>DynJSRuntime.java</code></h3>
-          <pre><code class="java">public NodeProcess initialize() {
-
-        NodeProcess javaProcess = new NodeProcess(this);
-        getEventLoop().setProcess(javaProcess);
-
-        DynJS runtime = new DynJS(config);
-        JSObject global = runtime.getGlobalContext().getObject();
-        ExecutionContext context = runtime.getDefaultExecutionContext();
-
-        JSFunction processFunction = (JSFunction) runScript(PROCESS);
-        context.call(processFunction, global, javaProcess);
-
-        JSFunction nodeFunction = (JSFunction) runScript(NODE_JS);
-        context.call(nodeFunction, global, javaProcess);
-
-        return javaProcess;
-    }
-</code></pre>
-        </section>
-
-        <section>
-          <h2>Node Process (Unchanged)</h2>
-          <h3 style="color:red"><code>src/node.js</code></h3>
+          <h2>Node Process</h2>
+          <h3 style="color:red"><code>src/node.js</code> - Unchanged</h3>
           <pre><code class="javascript">(function(process) {
   this.global = this;
 
@@ -406,17 +416,57 @@ fs.exists = function(path, callback) {
         </section>
 
         <section>
+          <h2>Loading Node.js in Nodyn</h2>
+          <h3 style="color:red"><code>DynJSRuntime.java</code></h3>
+          <pre><code class="java" style="line-height:22px">protected static final String NODE_JS = "node.js";
+protected static final String PROCESS = "nodyn/process.js";
+
+public NodeProcess initialize() {
+    NodeProcess javaProcess = new NodeProcess(this);
+    getEventLoop().setProcess(javaProcess);
+
+    DynJS runtime = new DynJS(config);
+    JSObject global = runtime.getGlobalContext().getObject();
+    ExecutionContext context = runtime.getDefaultExecutionContext();
+
+    JSFunction processFunction = (JSFunction) runScript(PROCESS);
+    context.call(processFunction, global, javaProcess);
+
+    JSFunction nodeFunction = (JSFunction) runScript(NODE_JS);
+    context.call(nodeFunction, global, javaProcess);
+    return javaProcess;
+}
+</code></pre>
+        </section>
+
+        <section>
           <h2>Process Bindings</h2>
           <h3 style="color:red"><code>NodeProcess.java</code></h3>
           <pre><code class="java">public Object binding(String name) {
-        Object binding = this.bindings.get(name);
-        if (binding == null) {
-            binding = loadBinding(name);
-            this.bindings.put(name, binding);
-        }
-        return binding;
-    }</code></pre>
+    Object binding = this.bindings.get(name);
+    if (binding == null) {
+        binding = loadBinding(name);
+        this.bindings.put(name, binding);
+    }
+    return binding;
+}</code></pre>
         </section>
+
+        <section>
+          <h2>Process Bindings (Continued)</h2>
+          <h3 style="color:red"><code>DynJSRuntime.java</code></h3>
+          <pre><code class="java">@Override
+public Object loadBinding(String name) {
+    try {
+        this.runner.withSource("__native_require('nodyn/bindings/" + name + "');");
+        return runner.execute();
+    } catch(Throwable t) {
+        this.handleThrowable(t);
+    }
+    return null;
+}</code></pre>
+        </section>
+
 
         <section>
           <h2>Bound Functions &amp; Properties</h2>
@@ -430,10 +480,21 @@ fs.exists = function(path, callback) {
 };
           </code></pre>
         </section>
-        
+
+        <section>
+          <h2>JNR Posix</h2>
+          <blockquote>
+            A lightweight cross-platform POSIX emulation layer for
+            Java, written in Java and is part of the JNR project
+          </blockquote>
+          <ul>
+            <li><a href="http://github.com/jnr">http://github.com/jnr</a></li>
+          </ul>
+        </section>
+
         <section>
           <h2><code>process.binding()</code></h2>
-          <h3 style="color:red"><code>lib/fs.js</code></h3>
+          <h3 style="color:red"><code>lib/fs.js</code> - Unchanged</h3>
           <pre><code class="javascript">var binding = process.binding('fs');
 
 fs.exists = function(path, callback) {
@@ -450,8 +511,23 @@ fs.exists = function(path, callback) {
         </section>
 
 				<section>
-					<h1>BAM</h1>
+					<h2>BAM</h2>
+          <p>Pure Node.js Javascript running on the JVM</p>
 				</section>
+
+				<section>
+					<h2>Conclusion</h2>
+          <img src="images/work-in-progress-sign.jpg" alt="work in progress"/>
+				</section>
+
+        <section>
+          <h2>Resources</h2>
+          <ul>
+            <li>Nodyn &mdash; <a href="http://nodyn.io">http://nodyn.io</a></li>
+            <li>DynJS &mdash; <a href="http://dynjs.org">http://dynjs.org</a></li>
+            <li>Node &mdash; <a href="http://nodejs.org">http://nodejs.org</a></li>
+          </ul>
+        </section>
 
 				<section>
 					<h1>THE END</h1>
